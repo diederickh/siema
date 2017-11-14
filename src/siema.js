@@ -47,6 +47,7 @@ export default class Siema {
       perPage: 1,
       startIndex: 0,
       draggable: true,
+      dragDirectionCheckThreshold: 64,
       multipleDrag: true,
       threshold: 20,
       loop: false,
@@ -90,7 +91,8 @@ export default class Siema {
         startX: 0,
         endX: 0,
         startY: 0,
-        letItGo: null
+        letItGo: null,
+        timeStarted: 0,
       };
 
       // Touch events
@@ -323,6 +325,7 @@ export default class Siema {
     this.pointerDown = true;
     this.drag.startX = e.touches[0].pageX;
     this.drag.startY = e.touches[0].pageY;
+    this.drag.timeStarted = e.timeStamp;
   }
 
 
@@ -347,12 +350,16 @@ export default class Siema {
   touchmoveHandler(e) {
     e.stopPropagation();
 
-    if (this.drag.letItGo === null) {
+    const dt = e.timeStamp - this.drag.timeStarted;
+
+    if (dt > this.config.dragDirectionCheckThreshold && this.drag.letItGo === null) {
       this.drag.letItGo = Math.abs(this.drag.startY - e.touches[0].pageY) < Math.abs(this.drag.startX - e.touches[0].pageX);
     }
 
     if (this.pointerDown && this.drag.letItGo) {
-      e.preventDefault();
+      if (e.cancelable === true) {
+        e.preventDefault();
+      }
       this.drag.endX = e.touches[0].pageX;
       this.sliderFrame.style.webkitTransition = `all 0ms ${this.config.easing}`;
       this.sliderFrame.style.transition = `all 0ms ${this.config.easing}`;
