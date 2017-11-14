@@ -51,6 +51,8 @@ export default class Siema {
       multipleDrag: true,
       threshold: 20,
       loop: false,
+      stopEventPropagation: true,
+      preventDefaultEvents: true,
       onInit: () => {},
       onChange: () => {},
     };
@@ -357,9 +359,11 @@ export default class Siema {
     }
 
     if (this.pointerDown && this.drag.letItGo) {
-      if (e.cancelable === true) {
+
+      if (this.config.preventDefaultEvents === true) {
         e.preventDefault();
       }
+
       this.drag.endX = e.touches[0].pageX;
       this.sliderFrame.style.webkitTransition = `all 0ms ${this.config.easing}`;
       this.sliderFrame.style.transition = `all 0ms ${this.config.easing}`;
