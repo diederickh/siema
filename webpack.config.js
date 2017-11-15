@@ -1,11 +1,13 @@
 const path = require('path');
 const webpack = require('webpack');
+const is_debug = process.argv.indexOf('--debug') > 0 ? true : false;
+const filename = (is_debug) ? "siema.dev.js" : "siema.min.js";
 
 module.exports = {
   entry: './src/siema.js',
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'siema.min.js',
+    filename: filename,
     library: 'Siema',
     libraryTarget: 'umd',
     umdNamedDefine: true
@@ -30,9 +32,9 @@ module.exports = {
     ]
   },
 
-  plugins: [
+  plugins: is_debug ? [] : [
     new webpack.optimize.UglifyJsPlugin({
-      minimize: true,
+      minimize: true
     }),
   ],
 };

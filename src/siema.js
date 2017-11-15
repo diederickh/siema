@@ -51,8 +51,8 @@ export default class Siema {
       multipleDrag: true,
       threshold: 20,
       loop: false,
-      stopEventPropagation: true,
       preventDefaultEvents: true,
+      transformPoint: function transform(p) { return p; },
       onInit: () => {},
       onChange: () => {},
     };
@@ -323,10 +323,17 @@ export default class Siema {
    * touchstart event handler
    */
   touchstartHandler(e) {
+
     e.stopPropagation();
+
+    const p = this.config.transformPoint({
+      x: e.touches[0].pageX,
+      y: e.touches[0].pageY
+    });
+
     this.pointerDown = true;
-    this.drag.startX = e.touches[0].pageX;
-    this.drag.startY = e.touches[0].pageY;
+    this.drag.startX = p.x;
+    this.drag.startY = p.y;
     this.drag.timeStarted = e.timeStamp;
   }
 
@@ -350,12 +357,18 @@ export default class Siema {
    * touchmove event handler
    */
   touchmoveHandler(e) {
+
     e.stopPropagation();
+
+    const p = this.config.transformPoint({
+      x: e.touches[0].pageX,
+      y: e.touches[0].pageY
+    });
 
     const dt = e.timeStamp - this.drag.timeStarted;
 
     if (dt > this.config.dragDirectionCheckThreshold && this.drag.letItGo === null) {
-      this.drag.letItGo = Math.abs(this.drag.startY - e.touches[0].pageY) < Math.abs(this.drag.startX - e.touches[0].pageX);
+      this.drag.letItGo = Math.abs(this.drag.startY - p.y) < Math.abs(this.drag.startX - p.x);
     }
 
     if (this.pointerDown && this.drag.letItGo) {
@@ -364,7 +377,7 @@ export default class Siema {
         e.preventDefault();
       }
 
-      this.drag.endX = e.touches[0].pageX;
+      this.drag.endX = p.x;
       this.sliderFrame.style.webkitTransition = `all 0ms ${this.config.easing}`;
       this.sliderFrame.style.transition = `all 0ms ${this.config.easing}`;
       this.sliderFrame.style[this.transformProperty] = `translate3d(${(this.currentSlide * (this.selectorWidth / this.perPage) + (this.drag.startX - this.drag.endX)) * -1}px, 0, 0)`;

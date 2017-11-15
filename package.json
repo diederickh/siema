@@ -15,7 +15,8 @@
   },
   "scripts": {
     "build": "webpack && cp dist/siema.min.js docs/assets",
-    "dev": "webpack --progress --colors --watch"
+    "dev": "webpack --progress --colors --watch",
+    "debug": "webpack --debug"
   },
   "repository": {
     "type": "git",
